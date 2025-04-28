@@ -18,11 +18,6 @@ export const sidebarNavItems = [
     icon: <FileText className="w-5 h-5" />,
   },
   {
-    title: "Networking",
-    href: "/dashboard/networking/cold-email",
-    icon: <Mail className="w-5 h-5" />,
-  },
-  {
     title: "Profile",
     href: "/dashboard/profile",
     icon: <Users className="w-5 h-5" />,

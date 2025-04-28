@@ -50,19 +50,19 @@ export function NavBar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-6">
-          <Link href="#features" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+          <Link href="/features" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
             Features
           </Link>
-          <Link href="#pricing" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+          <Link href="/pricing" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
             Pricing
           </Link>
           <Link
-            href="#testimonials"
+            href="/success-stories"
             className="text-sm font-medium text-foreground hover:text-primary transition-colors"
           >
             Success Stories
           </Link>
-          <Link href="#resources" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+          <Link href="/resources" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
             Resources
           </Link>
         </nav>
@@ -99,28 +99,28 @@ export function NavBar() {
         <div className="md:hidden bg-white border-t">
           <div className="container px-4 py-4 flex flex-col gap-4">
             <Link
-              href="#features"
+              href="/features"
               className="text-sm font-medium text-foreground hover:text-primary py-2 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Features
             </Link>
             <Link
-              href="#pricing"
+              href="/pricing"
               className="text-sm font-medium text-foreground hover:text-primary py-2 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Pricing
             </Link>
             <Link
-              href="#testimonials"
+              href="/success-stories"
               className="text-sm font-medium text-foreground hover:text-primary py-2 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Success Stories
             </Link>
             <Link
-              href="#resources"
+              href="/resources"
               className="text-sm font-medium text-foreground hover:text-primary py-2 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >

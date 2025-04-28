@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --primary: 99, 102, 241; /* #6366F1 - Modern Indigo */
-  --secondary: 168, 85, 247; /* #A855F7 - Rich Purple */
+  --primary: 10, 102, 194; /* #0A66C2 - LinkedIn Blue */
+  --secondary: 0, 119, 181; /* #0077B5 - Complementary Blue */
   --background: 255, 255, 255; /* #FFFFFF - Pure White */
   --foreground: 15, 23, 42; /* #0F172A - Slate 900 */
-  --accent: 244, 63, 94; /* #F43F5E - Vibrant Rose */
+  --accent: 79, 142, 213; /* #4F8ED5 - Light Blue */
   --muted: 241, 245, 249; /* #F1F5F9 - Slate 100 */
   
   /* New color variables */
@@ -27,6 +27,31 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(var(--muted), 0.5);
+  border-radius: 100px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(var(--primary), 0.3);
+  border-radius: 100px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--primary), 0.5);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--primary), 0.3) rgba(var(--muted), 0.5);
 }
 
 .glassmorphism {
@@ -66,7 +91,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, rgba(74, 144, 226, 0.2), rgba(80, 227, 194, 0.2));
+  background: linear-gradient(45deg, rgba(10, 102, 194, 0.2), rgba(0, 119, 181, 0.2));
   pointer-events: none;
 }
 

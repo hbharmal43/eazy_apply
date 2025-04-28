@@ -294,7 +294,7 @@ export default function ProfilePage() {
           bio: data.bio
         } : null)
       } else {
-        setProfileData(prev => prev ? { ...prev, ...updateData } : null)
+      setProfileData(prev => prev ? { ...prev, ...updateData } : null)
       }
       
       setEditingItem(null)
@@ -378,7 +378,7 @@ export default function ProfilePage() {
           }
         : {
             avatar_url: publicUrl
-          }
+      }
 
       const { error: updateError } = await supabase
         .from('profiles')
@@ -657,17 +657,17 @@ export default function ProfilePage() {
         </div>
         {profileData.resume_url ? (
           <div className="space-y-4">
-            <div className="bg-blue-50 p-6 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <Link2 className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-blue-900">{profileData.resume_filename || 'Your Resume'}</h3>
-                    <p className="text-sm text-blue-600">Last updated: {new Date().toLocaleDateString()}</p>
-                  </div>
+          <div className="bg-blue-50 p-6 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <Link2 className="w-6 h-6 text-blue-600" />
                 </div>
+                <div>
+                    <h3 className="font-medium text-blue-900">{profileData.resume_filename || 'Your Resume'}</h3>
+                  <p className="text-sm text-blue-600">Last updated: {new Date().toLocaleDateString()}</p>
+                </div>
+              </div>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -694,11 +694,11 @@ export default function ProfilePage() {
                         toast.error('Failed to preview resume')
                       }
                     }}
-                  >
-                    <ExternalLink className="w-4 h-4" />
+              >
+                <ExternalLink className="w-4 h-4" />
                     Preview
                   </Button>
-                </div>
+            </div>
               </div>
             </div>
             

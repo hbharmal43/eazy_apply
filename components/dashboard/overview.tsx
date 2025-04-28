@@ -8,10 +8,13 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
+  CartesianGrid,
+  Legend
 } from 'recharts'
 import { addDays, format } from 'date-fns'
 import { supabase } from '@/lib/supabase'
+import { Loader2 } from 'lucide-react'
 
 interface DailyApplications {
   date: string
@@ -94,7 +97,10 @@ export function Overview({ timeRange }: OverviewProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[350px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <p className="mt-2 text-sm text-gray-500">Loading activity data...</p>
+        </div>
       </div>
     )
   }
@@ -102,10 +108,16 @@ export function Overview({ timeRange }: OverviewProps) {
   if (error) {
     return (
       <div className="flex justify-center items-center h-[350px] text-red-500">
-        {error}
+        <div className="bg-red-50 rounded-lg p-6 text-center max-w-md">
+          <p className="text-red-600 font-medium">{error}</p>
+          <p className="text-sm text-red-500 mt-1">Please try again later</p>
+        </div>
       </div>
     )
   }
+
+  const maxValue = Math.max(...data.map(item => Math.max(item.total, item.responses)))
+  const allowDecimals = maxValue < 10
 
   return (
     <div className="h-[350px]">
@@ -113,55 +125,60 @@ export function Overview({ timeRange }: OverviewProps) {
         <AreaChart
           data={data}
           margin={{
-            top: 5,
+            top: 10,
             right: 10,
-            left: 10,
-            bottom: 0,
+            left: 0,
+            bottom: 10,
           }}
         >
           <defs>
             <linearGradient id="total" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#0A66C2" stopOpacity={0.3} />
+              <stop offset="5%" stopColor="#0A66C2" stopOpacity={0.4} />
               <stop offset="95%" stopColor="#0A66C2" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="responses" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+              <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
               <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
             </linearGradient>
           </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
           <XAxis
             dataKey="date"
             stroke="#888888"
             fontSize={12}
             tickLine={false}
             axisLine={false}
+            padding={{ left: 10, right: 10 }}
           />
           <YAxis
             stroke="#888888"
             fontSize={12}
             tickLine={false}
             axisLine={false}
+            allowDecimals={allowDecimals}
             tickFormatter={(value) => `${value}`}
+            domain={[0, 'auto']}
           />
           <Tooltip
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 return (
-                  <div className="rounded-lg border bg-background p-2 shadow-sm">
-                    <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-xl border bg-white p-3 shadow-lg">
+                    <div className="text-sm font-medium text-gray-700 mb-2">{payload[0].payload.date}</div>
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col">
-                        <span className="text-[0.70rem] uppercase text-muted-foreground">
+                        <span className="text-xs uppercase text-gray-500">
                           Applications
                         </span>
-                        <span className="font-bold text-[#0A66C2]">
+                        <span className="font-bold text-[#0A66C2] text-base">
                           {payload[0].value}
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[0.70rem] uppercase text-muted-foreground">
+                        <span className="text-xs uppercase text-gray-500">
                           Responses
                         </span>
-                        <span className="font-bold text-emerald-500">
+                        <span className="font-bold text-emerald-500 text-base">
                           {payload[1].value}
                         </span>
                       </div>
@@ -172,19 +189,30 @@ export function Overview({ timeRange }: OverviewProps) {
               return null
             }}
           />
+          <Legend 
+            verticalAlign="top" 
+            height={30}
+            formatter={(value) => {
+              return <span className="text-xs font-medium text-gray-700">{value === 'total' ? 'Applications' : 'Responses'}</span>
+            }}
+          />
           <Area
             type="monotone"
             dataKey="total"
             stroke="#0A66C2"
-            strokeWidth={2}
+            strokeWidth={3}
             fill="url(#total)"
+            name="total"
+            activeDot={{ r: 6, strokeWidth: 0 }}
           />
           <Area
             type="monotone"
             dataKey="responses"
             stroke="#10B981"
-            strokeWidth={2}
+            strokeWidth={3}
             fill="url(#responses)"
+            name="responses"
+            activeDot={{ r: 6, strokeWidth: 0 }}
           />
         </AreaChart>
       </ResponsiveContainer>

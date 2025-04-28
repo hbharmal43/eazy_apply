@@ -30,11 +30,6 @@ const sidebarItems = [
     icon: FileText,
   },
   {
-    title: "Networking",
-    href: "/dashboard/networking/cold-email",
-    icon: Mail,
-  },
-  {
     title: "Profile",
     href: "/dashboard/profile",
     icon: User,
@@ -75,7 +70,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-[#F0F7FF]">
       {/* Sidebar */}
       <div className="w-64 bg-white border-r">
         <div className="h-16 flex items-center px-6 border-b">
@@ -90,7 +85,7 @@ export default function DashboardLayout({
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900",
-                  pathname === item.href ? "bg-gray-100 text-gray-900" : ""
+                  pathname === item.href ? "bg-blue-50 text-[#0A66C2]" : ""
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -112,7 +107,7 @@ export default function DashboardLayout({
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <header className="h-16 border-b bg-white flex items-center px-6">
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold text-[#0A66C2]">
             {sidebarItems.find((item) => item.href === pathname)?.title || "Dashboard"}
           </h2>
         </header>
