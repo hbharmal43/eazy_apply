@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { Mail, CheckCircle, Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { toast } from "@/components/ui/use-toast"
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isResending, setIsResending] = useState(false)
@@ -130,5 +130,25 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Loading fallback component
+function VerifyEmailLoading() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#F0F7FF] p-4">
+      <div className="w-full max-w-md space-y-8 bg-white rounded-xl p-8 shadow-md flex flex-col items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-[#0A66C2]" />
+        <p className="mt-4 text-gray-600">Loading verification page...</p>
+      </div>
+    </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailLoading />}>
+      <VerifyEmailContent />
+    </Suspense>
   )
 } 
