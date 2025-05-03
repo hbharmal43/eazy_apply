@@ -86,10 +86,10 @@ export default function LandingPage() {
               <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl hover-lift">
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-secondary/20 mix-blend-overlay"></div>
                 <Image
-                  src="/dashboard-preview.png"
-                  alt="EazyApply Student Dashboard"
+                  src="/image.png"
+                  alt="EazyApply Dashboard Analytics"
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
                 <div className="absolute inset-0 ring-1 ring-inset ring-white/10"></div>

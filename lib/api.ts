@@ -3,14 +3,44 @@ import { supabase } from '@/lib/supabase'
 export interface Profile {
   id: string
   full_name: string
-  title: string
-  location: string
-  phone: string
-  bio: string
-  skills: string[]
-  experience: string
-  education: string
-  daily_goal: number
+  avatar_url?: string
+  title?: string
+  email?: string
+  phone?: string
+  location?: string
+  bio?: string
+  education?: {
+    id?: string
+    school: string
+    degree: string
+    date: string
+  }[]
+  experience?: {
+    id?: string
+    title: string
+    company: string
+    location: string
+    date: string
+    description: string
+  }[]
+  projects?: {
+    id?: string
+    name: string
+    description: string
+    url: string
+  }[]
+  skills?: string[]
+  languages?: string[]
+  socials?: {
+    linkedin?: string
+    github?: string
+    portfolio?: string
+    website?: string
+  }
+  show_profile?: boolean
+  resume_url?: string
+  resume_filename?: string
+  daily_goal?: number
 }
 
 export interface Application {
@@ -293,4 +323,130 @@ export async function updateDailyGoal(goal: number) {
 
   if (error) throw error
   return data
+}
+
+// AI Assistant API
+export interface AIMessage {
+  role: "user" | "assistant" | "system"
+  content: string
+}
+
+export interface AIResponse {
+  id: string
+  choices: {
+    message: {
+      role: string
+      content: string
+    }
+    index: number
+  }[]
+}
+
+export interface AIAssistantSession {
+  id: string
+  user_id: string
+  created_at: string
+  updated_at: string
+  title: string
+  messages: AIMessage[]
+  generated_content_path: string | null
+}
+
+export async function saveGeneratedContent(content: string, contentType: string): Promise<string | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+    
+    // Generate a filename
+    const timestamp = new Date().toISOString().replace(/[-:.]/g, '')
+    const filename = `${contentType}_${timestamp}.md`
+    
+    // Save to storage
+    const { data, error } = await supabase
+      .storage
+      .from('generated_content')
+      .upload(`${user.id}/${filename}`, content, {
+        contentType: 'text/markdown',
+        upsert: false
+      })
+    
+    if (error) throw error
+    
+    return data.path
+  } catch (error) {
+    console.error('Error saving generated content:', error)
+    return null
+  }
+}
+
+export async function saveAssistantSession(
+  messages: AIMessage[], 
+  title: string,
+  generatedContentPath?: string
+): Promise<AIAssistantSession | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+    
+    const { data, error } = await supabase
+      .from('ai_assistant_sessions')
+      .insert([
+        {
+          user_id: user.id,
+          title,
+          messages,
+          generated_content_path: generatedContentPath || null
+        }
+      ])
+      .select()
+      .single()
+    
+    if (error) throw error
+    
+    return data
+  } catch (error) {
+    console.error('Error saving assistant session:', error)
+    return null
+  }
+}
+
+export async function getAssistantSessions(): Promise<AIAssistantSession[]> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+    
+    const { data, error } = await supabase
+      .from('ai_assistant_sessions')
+      .select()
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+    
+    if (error) throw error
+    
+    return data || []
+  } catch (error) {
+    console.error('Error getting assistant sessions:', error)
+    return []
+  }
+}
+
+export async function getAssistantSession(id: string): Promise<AIAssistantSession | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+    
+    const { data, error } = await supabase
+      .from('ai_assistant_sessions')
+      .select()
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single()
+    
+    if (error) throw error
+    
+    return data
+  } catch (error) {
+    console.error('Error getting assistant session:', error)
+    return null
+  }
 } 

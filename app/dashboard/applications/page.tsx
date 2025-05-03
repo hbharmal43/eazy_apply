@@ -270,22 +270,22 @@ export default function ApplicationsPage() {
       {/* Search and Filter */}
       <Card className="bg-white border-none shadow-md rounded-xl overflow-hidden">
         <CardContent className="pt-6 pb-4">
-          <div className="flex gap-4 items-center">
-            <div className="relative flex-1">
+      <div className="flex gap-4 items-center">
+        <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
+          <Input
                 placeholder="Search by position, company or location..."
                 className="pl-10 py-2 border-gray-200 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 rounded-lg"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
             <Button variant="outline" className="flex gap-2 border-gray-200 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 rounded-lg">
-              <Filter className="h-4 w-4" />
-              Filters
+          <Filter className="h-4 w-4" />
+          Filters
               <ChevronDown className="h-4 w-4" />
-            </Button>
-          </div>
+        </Button>
+      </div>
         </CardContent>
       </Card>
 
@@ -295,17 +295,17 @@ export default function ApplicationsPage() {
           <CardTitle className="text-lg font-semibold text-gray-800">Application History</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
+      {loading ? (
             <div className="flex justify-center items-center py-16">
               <div className="flex flex-col items-center">
                 <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
                 <p className="mt-4 text-gray-500">Loading your applications...</p>
               </div>
-            </div>
-          ) : (
+        </div>
+      ) : (
             <>
               <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-                <Table>
+          <Table>
                   <TableHeader className="sticky top-0 z-10">
                     <TableRow className="bg-gray-50 border-b">
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Position</TableHead>
@@ -317,22 +317,22 @@ export default function ApplicationsPage() {
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Source</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Status</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
                     {currentItems.length === 0 ? (
-                      <TableRow>
+                <TableRow>
                         <TableCell colSpan={9} className="text-center py-16 text-gray-500">
                           <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                           <p className="font-medium">
-                            {searchQuery ? 'No applications match your search' : 'No applications yet'}
+                    {searchQuery ? 'No applications match your search' : 'No applications yet'}
                           </p>
                           <p className="text-sm mt-1">
                             {searchQuery ? 'Try adjusting your search terms' : 'Start tracking your job applications'}
                           </p>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
+                  </TableCell>
+                </TableRow>
+              ) : (
                       currentItems.map((app) => {
                         const statusStyle = getStatusStyle(app.status);
                         return (
@@ -381,30 +381,30 @@ export default function ApplicationsPage() {
                                 <span>{app.apply_time} min</span>
                               </div>
                             </TableCell>
-                            <TableCell>
+                    <TableCell>
                               <div className="flex items-center gap-1.5">
                                 <Globe className="h-3.5 w-3.5 text-gray-400" />
                                 <span>{app.source}</span>
                               </div>
-                            </TableCell>
-                            <TableCell>
+                    </TableCell>
+                    <TableCell>
                               <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusStyle.bgColor} ${statusStyle.textColor}`}>
                                 {statusStyle.icon}
-                                {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                        {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                               </div>
-                            </TableCell>
-                            <TableCell>
+                    </TableCell>
+                    <TableCell>
                               <Button variant="ghost" size="sm" className="rounded-full hover:bg-blue-100 hover:text-blue-800 p-2">
                                 <EyeIcon className="h-4 w-4" />
                               </Button>
-                            </TableCell>
-                          </TableRow>
+                    </TableCell>
+                  </TableRow>
                         )
                       })
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
               {totalItems > 0 && (
                 <div className="flex flex-col gap-2 items-center justify-center py-6 border-t">

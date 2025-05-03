@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   Users,
   Mail,
+  Bot,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase"
@@ -33,6 +34,11 @@ const sidebarItems = [
     title: "Profile",
     href: "/dashboard/profile",
     icon: User,
+  },
+  {
+    title: "AI Assistant",
+    href: "/dashboard/assistant",
+    icon: Bot,
   },
   {
     title: "Settings",

@@ -1,22 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EazyApply
+
+Job application tracker with AI-powered features to help manage and optimize your job search.
+
+## Features
+
+- Dashboard with job application analytics
+- Application tracking and management
+- Resume and profile management
+- Streak tracking for consistent job applications
+- AI Assistant for resume and cover letter generation
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```
+# OpenRouter API Key for AI Assistant
+NEXT_PUBLIC_OPENROUTER_API_KEY=your_openrouter_api_key_here
+```
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Run the development server: `npm run dev`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## AI Assistant
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The AI Assistant feature uses OpenRouter API to provide personalized resume and cover letter generation based on the user's profile information. The assistant can help with:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Creating tailored resumes for specific job positions
+- Writing personalized cover letters
+- Providing job application advice
+- Optimizing LinkedIn profiles
+- Interview preparation
+
+To setup the AI Assistant:
+
+1. Get an API key from [OpenRouter](https://openrouter.ai)
+2. Add the API key to your `.env.local` file
+3. The assistant will be available in the dashboard under "AI Assistant"
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

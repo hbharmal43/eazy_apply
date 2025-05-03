@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Your EazyApply Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f9ff;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background-color: #0A66C2;
+      padding: 20px;
+      text-align: center;
+    }
+    .header img {
+      max-height: 50px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .footer {
+      background-color: #f0f7ff;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+    }
+    .button {
+      display: inline-block;
+      background-color: #0A66C2;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .button:hover {
+      background-color: #084e96;
+    }
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .stat {
+      padding: 10px;
+      background-color: #f0f7ff;
+      border-radius: 8px;
+      flex: 1;
+      margin: 0 5px;
+    }
+    .stat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0A66C2;
+    }
+    h1 {
+      color: #0A66C2;
+      margin-top: 0;
+    }
+    .link {
+      color: #0A66C2;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <img src="https://website-omega-olive-64.vercel.app/logo.png" alt="EazyApply Logo">
+    </div>
+    <div class="content">
+      <h1>Welcome to EazyApply!</h1>
+      <p>Thank you for signing up. You're just one step away from simplifying your job search journey.</p>
+      
+      <p>Please confirm your email address to activate your account and start applying to internships and entry-level positions with just one click.</p>
+      
+      <div style="text-align: center;">
+        <a href="{{ .ConfirmationURL }}" class="button">Confirm My Email</a>
+      </div>
+      
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-number">10,000+</div>
+          <div>Students</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">500+</div>
+          <div>Universities</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">80%</div>
+          <div>Time Saved</div>
+        </div>
+      </div>
+      
+      <p>After confirming, you'll be able to:</p>
+      <ul>
+        <li>Apply to hundreds of positions with one click</li>
+        <li>Track all your applications in one place</li>
+        <li>Get AI-powered insights to improve your chances</li>
+      </ul>
+      
+      <p>If you didn't create an account, you can ignore this email.</p>
+      
+      <p>If you're having trouble with the button above, copy and paste the URL below into your web browser:</p>
+      <p>{{ .ConfirmationURL }}</p>
+    </div>
+    <div class="footer">
+      <p>© 2025 EazyApply for Students. All rights reserved.</p>
+      <p>Helping students land their dream internships and first jobs.</p>
+      <p><a href="https://website-omega-olive-64.vercel.app/" class="link">website-omega-olive-64.vercel.app</a></p>
+    </div>
+  </div>
+</body>
+</html> 
