@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { getAuthenticatedUser, safeAuthOperation, retrySupabaseOperation } from '@/lib/auth-utils'
 
 export interface Profile {
   id: string
@@ -41,6 +42,57 @@ export interface Profile {
   resume_url?: string
   resume_filename?: string
   daily_goal?: number
+  
+  // NEW WORKDAY AUTOFILL FIELDS
+  // Critical personal information
+  first_name?: string
+  last_name?: string
+  
+  // Detailed address fields
+  address_line_1?: string
+  address_line_2?: string
+  city?: string
+  state?: string
+  postal_code?: string
+  country?: string
+  county?: string
+  
+  // Enhanced phone information
+  phone_device_type?: string
+  country_phone_code?: string
+  phone_extension?: string
+  
+  // Workday-specific application fields
+  how_did_you_hear_about_us?: string
+  previously_worked_for_workday?: boolean
+  work_authorization_status?: string
+  visa_sponsorship_required?: string
+  
+  // Voluntary disclosure fields (EEO compliance)
+  gender?: string
+  ethnicity?: string
+  military_veteran?: string
+  disability_status?: string
+  
+  // Additional document fields
+  cover_letter_url?: string
+  cover_letter_filename?: string
+  portfolio_urls?: string[]
+  
+  // Additional profile questions for comprehensive autofill
+  preferred_work_location?: string
+  salary_expectation?: string
+  available_start_date?: string
+  willing_to_relocate?: boolean
+  years_of_experience?: number
+  highest_education_level?: string
+  certifications?: string[]
+  linkedin_url?: string
+  github_url?: string
+  personal_website?: string
+  references_available?: boolean
+  background_check_consent?: boolean
+  drug_test_consent?: boolean
 }
 
 export interface Application {
@@ -74,9 +126,8 @@ export interface ApplicationStats {
 
 // Profile functions
 export async function getProfile() {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-
+  return safeAuthOperation(async (user) => {
+    return retrySupabaseOperation(async () => {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -85,12 +136,13 @@ export async function getProfile() {
 
   if (error) throw error
   return data
+    })
+  })
 }
 
 export async function updateProfile(profile: Partial<Profile>) {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-
+  return safeAuthOperation(async (user) => {
+    return retrySupabaseOperation(async () => {
   const { data, error } = await supabase
     .from('profiles')
     .update(profile)
@@ -100,6 +152,8 @@ export async function updateProfile(profile: Partial<Profile>) {
 
   if (error) throw error
   return data
+    })
+  })
 }
 
 // Application functions
