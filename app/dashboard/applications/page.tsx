@@ -83,15 +83,41 @@ export default function ApplicationsPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) throw new Error('Not authenticated')
 
-        const { data, error } = await supabase
-          .from('applications')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('applied_date', { ascending: false })
+        // Use pagination to fetch ALL records
+        let allApplications: any[] = []
+        let page = 0
+        const pageSize = 1000
+        
+        while (true) {
+          const { data, error } = await supabase
+            .from('applications')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('applied_date', { ascending: false })
+            .range(page * pageSize, (page + 1) * pageSize - 1)
 
-        if (error) throw error
-
-        setApplications(data || [])
+          if (error) throw error
+          
+          if (!data || data.length === 0) {
+            break
+          }
+          
+          allApplications = [...allApplications, ...data]
+          
+          // If we got less than a full page, we're done
+          if (data.length < pageSize) {
+            break
+          }
+          
+          page++
+          
+          // Safety break to prevent infinite loops
+          if (page > 10) {
+            break
+          }
+        }
+        
+        setApplications(allApplications)
       } catch (err) {
         console.error('Error fetching applications:', err)
         setError('Failed to load applications')

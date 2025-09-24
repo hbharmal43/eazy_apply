@@ -48,6 +48,7 @@ export function Overview({ timeRange }: OverviewProps) {
           .gte('applied_date', startDate.toISOString())
           .lte('applied_date', endDate.toISOString())
           .order('applied_date', { ascending: true })
+          .limit(5000) // Increase limit to handle large number of applications
 
         if (applicationsError) throw applicationsError
 

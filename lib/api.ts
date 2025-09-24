@@ -173,6 +173,7 @@ export async function getApplications() {
     .select('*')
     .eq('user_id', user.id)
     .order('applied_date', { ascending: false })
+    .limit(5000) // Increase limit to handle large number of applications
 
   if (error) throw error
   return data
