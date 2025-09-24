@@ -441,7 +441,6 @@ export function ApplicationDetailsModal({ isOpen, onClose, applicationId }: Appl
           application={application}
           userProfile={userProfile}
           snovToken={snovToken}
-          openrouterKey={process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || ''}
         />
       )}
     </div>

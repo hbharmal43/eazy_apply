@@ -751,13 +751,13 @@ export async function resolveContactEmail(contact: FoundContact, accessToken: st
   
   try {
     console.log('🔍 Resolving email for selected contact:', contact.fullName);
-    console.log('🔍 This may take up to 60 seconds...');
+    console.log('🔍 This may take up to 30 seconds...');
     
     const emailTaskHash = await findProspectEmail(contact.searchEmailsUrl, accessToken);
     
     const emailResults = await waitForTaskCompletion(
       () => getEmailResults(emailTaskHash, accessToken),
-      30, // 30 attempts max (60 seconds total)
+      15, // 15 attempts max (30 seconds total) - reduced to prevent infinite loops
       2000 // 2 second delay between attempts
     );
     

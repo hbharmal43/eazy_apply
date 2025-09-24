@@ -22,7 +22,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { ApplicationWithCustomFiles } from '@/lib/api'
 import { snovFindContacts, resolveContactEmail, type FoundContact, type SnovUsageStats } from '@/lib/snov-api'
-import { generateColdEmail, type EmailDraft, type UserProfile } from '@/lib/openrouter-api'
+import type { EmailDraft, UserProfile } from '@/lib/openrouter-api'
 import { buildGmailComposeUrl, openEmailCompose, EMAIL_PROVIDERS, type EmailProvider } from '@/lib/gmail-utils'
 
 interface ColdEmailModalProps {
@@ -31,7 +31,6 @@ interface ColdEmailModalProps {
   application: ApplicationWithCustomFiles
   userProfile: UserProfile
   snovToken: string
-  openrouterKey: string
 }
 
 interface ColdEmailState {
@@ -51,8 +50,7 @@ export function ColdEmailModal({
   onClose, 
   application, 
   userProfile, 
-  snovToken,
-  openrouterKey
+  snovToken
 }: ColdEmailModalProps) {
   const [state, setState] = useState<ColdEmailState>({
     step: 'finding-contacts',
@@ -220,23 +218,50 @@ export function ColdEmailModal({
         jobTitle: application.position,
         company: application.company,
         user: userProfile?.full_name || 'Unknown User',
-        userProfile: userProfile
+        userProfile: userProfile,
+        selectedContact: selectedContact
+      });
+      
+      // Debug: Log the actual user profile structure
+      console.log('🔍 User profile structure:', {
+        keys: Object.keys(userProfile || {}),
+        full_name: userProfile?.full_name,
+        title: userProfile?.title,
+        email: userProfile?.email,
+        phone: userProfile?.phone,
+        first_name: userProfile?.first_name,
+        last_name: userProfile?.last_name
       });
 
-      // Generate email
-      const emailDraft = await generateColdEmail({
-        apiKey: openrouterKey,
-        jobTitle: application.position,
-        company: application.company,
-        companyUrl: application.company_url,
-        jobLocation: application.location,
-        user: userProfile || {
-          full_name: 'Job Applicant',
-          title: 'Software Developer',
-          skills: [],
-          projects: []
+      // Generate email via backend API
+      const response = await fetch('/api/cold-email/generate-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      })
+        body: JSON.stringify({
+          jobTitle: application.position,
+          company: application.company,
+          companyUrl: application.company_url,
+          jobLocation: application.location,
+          user: userProfile || {
+            full_name: 'Job Applicant',
+            title: 'Software Developer',
+            email: 'your.email@example.com',
+            phone: 'your phone number',
+            skills: [],
+            projects: []
+          },
+          selectedContact: selectedContact,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate email');
+      }
+
+      const emailDraft = await response.json();
 
       console.log('🔍 Generated email draft:', {
         subject: emailDraft.subject,
