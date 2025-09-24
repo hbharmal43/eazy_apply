@@ -226,12 +226,8 @@ export async function deleteApplication(id: string) {
 // Statistics functions
 export async function getApplicationStats(): Promise<ApplicationStats> {
   try {
-    console.log('Starting getApplicationStats function')
     const now = new Date()
-    console.log('Current local time:', now.toLocaleString())
-    console.log('Current UTC time:', now.toUTCString())
     const timezoneOffset = -now.getTimezoneOffset() // Convert to minutes ahead of UTC
-    console.log('Timezone offset (minutes):', timezoneOffset)
     
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     
@@ -245,10 +241,7 @@ export async function getApplicationStats(): Promise<ApplicationStats> {
       throw new Error('Not authenticated')
     }
     
-    console.log('User found, ID:', user.id)
-    
     try {
-      console.log('Calling RPC function get_application_stats with:', { user_id: user.id, timezone_offset: timezoneOffset })
       const { data, error } = await supabase
         .rpc('get_application_stats', { 
           user_id: user.id,
@@ -261,10 +254,7 @@ export async function getApplicationStats(): Promise<ApplicationStats> {
         throw error
       }
 
-      console.log('RPC call successful, raw data:', data)
-
       if (!data) {
-        console.log('No data returned, using default values')
         // Return default values if no data
         return {
           total_applications: 0,
@@ -293,8 +283,6 @@ export async function getApplicationStats(): Promise<ApplicationStats> {
         streak_start_date: typeof rawData.streak_start_date === 'string' ? rawData.streak_start_date : ''
       }
       
-      console.log('Raw data from RPC:', rawData)
-      console.log('Processed stats:', stats)
       return stats
     } catch (error) {
       console.error('Error in RPC call:', error)
