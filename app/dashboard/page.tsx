@@ -183,20 +183,29 @@ export default function DashboardPage() {
           <CardContent className="pt-4">
             <div className="flex flex-col">
               <div className="flex items-baseline justify-between">
-                <div className="text-3xl font-bold text-gray-900">{stats.applications_this_week || 66}</div>
-                <div className="text-gray-500 text-sm">/175</div>
+                <div className="text-3xl font-bold text-gray-900">{stats.applications_this_week || 0}</div>
+                <div className="text-gray-500 text-sm">/{dailyGoal * 7}</div>
               </div>
               
               <div className="mt-2 w-full bg-gray-100 rounded-full h-2.5">
-                <div className="bg-[#0A66C2] h-2.5 rounded-full" style={{ width: '38%' }}></div>
+                <div 
+                  className="bg-[#0A66C2] h-2.5 rounded-full transition-all duration-300" 
+                  style={{ width: `${Math.min(((stats.applications_this_week || 0) / (dailyGoal * 7)) * 100, 100)}%` }}
+                ></div>
               </div>
               
               <div className="mt-3">
-                <div className="text-[#0A66C2] font-medium text-sm">
-                  109 more to reach weekly goal
-                </div>
+                {stats.applications_this_week >= (dailyGoal * 7) ? (
+                  <div className="text-emerald-600 font-medium text-sm">
+                    Weekly goal achieved! 🎉
+                  </div>
+                ) : (
+                  <div className="text-[#0A66C2] font-medium text-sm">
+                    {(dailyGoal * 7) - (stats.applications_this_week || 0)} more to reach weekly goal
+                  </div>
+                )}
                 <div className="text-gray-500 text-xs mt-1">
-                  Average: 9.4 per day
+                  Average: {((stats.applications_this_week || 0) / 7).toFixed(1)} per day
                 </div>
               </div>
             </div>
