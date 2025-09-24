@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,8 @@ interface PersonalInfoTabProps {
 
 export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTabProps) {
   const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const [isSavingPersonal, setIsSavingPersonal] = useState(false)
+  const [isSavingEmployment, setIsSavingEmployment] = useState(false)
   const [formData, setFormData] = useState({
     first_name: profileData?.first_name || '',
     last_name: profileData?.last_name || '',
@@ -38,21 +39,61 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
     work_authorization_us: profileData?.work_authorization_us ?? true,
     work_authorization_canada: profileData?.work_authorization_canada ?? false,
     work_authorization_uk: profileData?.work_authorization_uk ?? false,
-    visa_sponsorship_required: profileData?.visa_sponsorship_required ?? false,
+    visa_sponsorship_required: profileData?.visa_sponsorship_required || '',
     
     // EEO Compliance (Optional)
     ethnicity: profileData?.ethnicity || '',
     gender: profileData?.gender || '',
     lgbtq_status: profileData?.lgbtq_status || '',
-    military_veteran: profileData?.military_veteran,
-    disability_status: profileData?.disability_status
+    sexual_orientation: profileData?.sexual_orientation || '',
+    transgender_identity: profileData?.transgender_identity || '',
+    military_veteran: profileData?.military_veteran || '',
+    disability_status: profileData?.disability_status || ''
   })
 
   const supabase = createClientComponentClient()
 
+  // Update form data when profileData changes
+  useEffect(() => {
+    if (profileData) {
+      setFormData({
+        first_name: profileData?.first_name || '',
+        last_name: profileData?.last_name || '',
+        email: profileData?.email || '',
+        phone: profileData?.phone || '',
+        country_phone_code: profileData?.country_phone_code || '+1',
+        phone_device_type: profileData?.phone_device_type || 'mobile',
+        birthday: profileData?.birthday || '',
+        title: profileData?.title || '',
+        willing_to_relocate: profileData?.willing_to_relocate ?? false,
+        address_line_1: profileData?.address_line_1 || '',
+        address_line_2: profileData?.address_line_2 || '',
+        city: profileData?.city || '',
+        state: profileData?.state || '',
+        postal_code: profileData?.postal_code || '',
+        country: profileData?.country || 'United States',
+        
+        // Work Authorization
+        work_authorization_us: profileData?.work_authorization_us ?? true,
+        work_authorization_canada: profileData?.work_authorization_canada ?? false,
+        work_authorization_uk: profileData?.work_authorization_uk ?? false,
+        visa_sponsorship_required: profileData?.visa_sponsorship_required || '',
+        
+        // EEO Compliance (Optional)
+        ethnicity: profileData?.ethnicity || '',
+        gender: profileData?.gender || '',
+        lgbtq_status: profileData?.lgbtq_status || '',
+        sexual_orientation: profileData?.sexual_orientation || '',
+        transgender_identity: profileData?.transgender_identity || '',
+        military_veteran: profileData?.military_veteran || '',
+        disability_status: profileData?.disability_status || ''
+      })
+    }
+  }, [profileData])
+
   const handleSave = async () => {
     try {
-      setIsSaving(true)
+      setIsSavingPersonal(true)
       
       // Convert empty string birthday to null
       const payload = {
@@ -74,7 +115,43 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
       console.error('Error updating personal info:', error)
       toast.error('Failed to update personal information')
     } finally {
-      setIsSaving(false)
+      setIsSavingPersonal(false)
+    }
+  }
+
+  const handleEmploymentInfoSave = async () => {
+    try {
+      setIsSavingEmployment(true)
+      
+      // Only save employment-related fields
+      const payload = {
+        ethnicity: formData.ethnicity,
+        gender: formData.gender,
+        lgbtq_status: formData.lgbtq_status,
+        sexual_orientation: formData.sexual_orientation,
+        transgender_identity: formData.transgender_identity,
+        military_veteran: formData.military_veteran,
+        disability_status: formData.disability_status,
+        work_authorization_us: formData.work_authorization_us,
+        work_authorization_canada: formData.work_authorization_canada,
+        work_authorization_uk: formData.work_authorization_uk,
+        visa_sponsorship_required: formData.visa_sponsorship_required,
+      }
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update(payload)
+        .eq('id', profileData.user_id)
+
+      if (error) throw error
+
+      toast.success('Employment information updated successfully')
+      onProfileUpdate()
+    } catch (error) {
+      console.error('Error updating employment info:', error)
+      toast.error('Failed to update employment information')
+    } finally {
+      setIsSavingEmployment(false)
     }
   }
 
@@ -330,10 +407,10 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
           </Button>
           <Button 
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSavingPersonal}
             className="bg-teal-600 hover:bg-teal-700"
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSavingPersonal ? 'Saving...' : 'Save'}
           </Button>
         </div>
       )}
@@ -353,13 +430,25 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
         <div>
           <Label className="text-sm font-medium text-gray-700 mb-3 block">What is your ethnicity?</Label>
           <div className="grid grid-cols-2 gap-3">
-            {['American Indian or Alaska Native', 'Asian', 'Black or African American', 'Hispanic or Latino', 'Native Hawaiian or Other Pacific Islander', 'South Asian', 'White', 'Two or More Races'].map((option) => (
+            {[
+              'Alaskan Native / American Indian / Indigenous American / Native American',
+              'Black / Of African descent',
+              'East Asian',
+              'Latinx',
+              'Middle Eastern',
+              'Pacific Islander',
+              'South Asian',
+              'Southeast Asian',
+              'White',
+              'I prefer to self-describe',
+              "I don't wish to answer"
+            ].map((option) => (
               <label key={option} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
                   type="radio"
                   name="ethnicity"
-                  value={option.toLowerCase().replace(/\s+/g, '_')}
-                  checked={formData.ethnicity === option.toLowerCase().replace(/\s+/g, '_')}
+                  value={option}
+                  checked={formData.ethnicity === option}
                   onChange={(e) => setFormData({ ...formData, ethnicity: e.target.value })}
                   className="w-4 h-4 text-teal-600"
                 />
@@ -455,8 +544,8 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
                 <input
                   type="radio"
                   name="visa_sponsorship"
-                  checked={formData.visa_sponsorship_required === true}
-                  onChange={() => setFormData({ ...formData, visa_sponsorship_required: true })}
+                  checked={formData.visa_sponsorship_required === "Yes"}
+                  onChange={() => setFormData({ ...formData, visa_sponsorship_required: "Yes" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 Yes
@@ -465,8 +554,8 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
                 <input
                   type="radio"
                   name="visa_sponsorship"
-                  checked={formData.visa_sponsorship_required === false}
-                  onChange={() => setFormData({ ...formData, visa_sponsorship_required: false })}
+                  checked={formData.visa_sponsorship_required === "No"}
+                  onChange={() => setFormData({ ...formData, visa_sponsorship_required: "No" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 No
@@ -481,8 +570,8 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
                 <input
                   type="radio"
                   name="disability"
-                  checked={formData.disability_status === true}
-                  onChange={() => setFormData({ ...formData, disability_status: true })}
+                  checked={formData.disability_status === "Yes"}
+                  onChange={() => setFormData({ ...formData, disability_status: "Yes" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 Yes
@@ -491,8 +580,8 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
                 <input
                   type="radio"
                   name="disability"
-                  checked={formData.disability_status === false}
-                  onChange={() => setFormData({ ...formData, disability_status: false })}
+                  checked={formData.disability_status === "No"}
+                  onChange={() => setFormData({ ...formData, disability_status: "No" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 No
@@ -501,8 +590,8 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
                 <input
                   type="radio"
                   name="disability"
-                  checked={formData.disability_status === null}
-                  onChange={() => setFormData({ ...formData, disability_status: null })}
+                  checked={formData.disability_status === "Decline to state"}
+                  onChange={() => setFormData({ ...formData, disability_status: "Decline to state" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 Decline to state
@@ -551,7 +640,7 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
 
           <div>
             <Label className="text-sm font-medium text-gray-700 mb-3 block">What is your gender?</Label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-4">
               {['Male', 'Female', 'Non-Binary', 'Decline to state'].map((option) => (
                 <label key={option} className="flex items-center">
                   <input
@@ -569,14 +658,64 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
           </div>
 
           <div>
+            <Label className="text-sm font-medium text-gray-700 mb-3 block">I identify my sexual orientation as: *</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { value: 'Asexual', label: 'Asexual' },
+                { value: 'Bisexual, pansexual and/or queer', label: 'Bisexual, pansexual and/or queer' },
+                { value: 'Gay and/or lesbian', label: 'Gay and/or lesbian' },
+                { value: 'Heterosexual', label: 'Heterosexual' },
+                { value: 'I prefer to self-describe', label: 'I prefer to self-describe' },
+                { value: "I don't wish to answer", label: "I don't wish to answer" }
+              ].map((option) => (
+                <label key={option.value} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="sexual_orientation"
+                    value={option.value}
+                    checked={formData.sexual_orientation === option.value}
+                    onChange={(e) => setFormData({ ...formData, sexual_orientation: e.target.value })}
+                    className="w-4 h-4 text-teal-600"
+                  />
+                  <span className="text-sm text-gray-700">{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium text-gray-700 mb-3 block">I identify as transgender: *</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { value: 'Yes', label: 'Yes' },
+                { value: 'No', label: 'No' },
+                { value: 'I prefer to self-describe', label: 'I prefer to self-describe' },
+                { value: "I don't wish to answer", label: "I don't wish to answer" }
+              ].map((option) => (
+                <label key={option.value} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="transgender_identity"
+                    value={option.value}
+                    checked={formData.transgender_identity === option.value}
+                    onChange={(e) => setFormData({ ...formData, transgender_identity: e.target.value })}
+                    className="w-4 h-4 text-teal-600"
+                  />
+                  <span className="text-sm text-gray-700">{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <Label className="text-sm font-medium text-gray-700 mb-3 block">Are you a veteran?</Label>
             <div className="flex gap-4">
               <label className="flex items-center">
                 <input
                   type="radio"
                   name="veteran"
-                  checked={formData.military_veteran === true}
-                  onChange={() => setFormData({ ...formData, military_veteran: true })}
+                  checked={formData.military_veteran === "Yes"}
+                  onChange={() => setFormData({ ...formData, military_veteran: "Yes" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 Yes
@@ -585,8 +724,8 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
                 <input
                   type="radio"
                   name="veteran"
-                  checked={formData.military_veteran === false}
-                  onChange={() => setFormData({ ...formData, military_veteran: false })}
+                  checked={formData.military_veteran === "No"}
+                  onChange={() => setFormData({ ...formData, military_veteran: "No" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 No
@@ -595,8 +734,8 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
                 <input
                   type="radio"
                   name="veteran"
-                  checked={formData.military_veteran === null}
-                  onChange={() => setFormData({ ...formData, military_veteran: null })}
+                  checked={formData.military_veteran === "Decline to state"}
+                  onChange={() => setFormData({ ...formData, military_veteran: "Decline to state" })}
                   className="w-4 h-4 text-teal-600 mr-2"
                 />
                 Decline to state
@@ -607,11 +746,11 @@ export function PersonalInfoTab({ profileData, onProfileUpdate }: PersonalInfoTa
 
         <div className="flex justify-end pt-4">
           <Button 
-            onClick={handleSave}
-            disabled={isSaving}
+            onClick={handleEmploymentInfoSave}
+            disabled={isSavingEmployment}
             className="bg-teal-600 hover:bg-teal-700"
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSavingEmployment ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </div>

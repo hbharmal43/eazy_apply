@@ -19,8 +19,10 @@ import { PortfolioLinksModal } from "./PortfolioLinksModal"
 import { LanguagesModal } from "./LanguagesModal"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Loader2, Upload } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
 
 interface SimplifyProfileLayoutProps {
   profileData: any
@@ -38,7 +40,109 @@ export function SimplifyProfileLayout({ profileData, onProfileUpdate }: Simplify
   const [showAvatarModal, setShowAvatarModal] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState("")
+  const [deletingExperienceId, setDeletingExperienceId] = useState<string | null>(null)
+  const [deletingEducationId, setDeletingEducationId] = useState<string | null>(null)
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null)
   const supabase = createClientComponentClient()
+
+  const handleDeleteExperience = async (experienceId: string) => {
+    setDeletingExperienceId(experienceId)
+  }
+
+  const confirmDeleteExperience = async () => {
+    if (!deletingExperienceId) return
+    
+    try {
+      const { error } = await supabase
+        .from('work_experiences')
+        .delete()
+        .eq('id', deletingExperienceId)
+
+      if (error) throw error
+
+      toast({
+        title: "Experience deleted",
+        description: "The work experience has been removed from your profile.",
+      })
+      
+      onProfileUpdate()
+    } catch (error: any) {
+      console.error('Error deleting experience:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete experience. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setDeletingExperienceId(null)
+    }
+  }
+
+  const handleDeleteEducation = async (educationId: string) => {
+    setDeletingEducationId(educationId)
+  }
+
+  const confirmDeleteEducation = async () => {
+    if (!deletingEducationId) return
+    
+    try {
+      const { error } = await supabase
+        .from('education')
+        .delete()
+        .eq('id', deletingEducationId)
+
+      if (error) throw error
+
+      toast({
+        title: "Education deleted",
+        description: "The education entry has been removed from your profile.",
+      })
+      
+      onProfileUpdate()
+    } catch (error: any) {
+      console.error('Error deleting education:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete education. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setDeletingEducationId(null)
+    }
+  }
+
+  const handleDeleteProject = async (projectId: string) => {
+    setDeletingProjectId(projectId)
+  }
+
+  const confirmDeleteProject = async () => {
+    if (!deletingProjectId) return
+    
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', deletingProjectId)
+
+      if (error) throw error
+
+      toast({
+        title: "Project deleted",
+        description: "The project has been removed from your profile.",
+      })
+      
+      onProfileUpdate()
+    } catch (error: any) {
+      console.error('Error deleting project:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete project. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setDeletingProjectId(null)
+    }
+  }
 
   if (!profileData) {
     return <div>Loading...</div>
@@ -258,6 +362,9 @@ export function SimplifyProfileLayout({ profileData, onProfileUpdate }: Simplify
             onManageSkills={() => setShowSkillsManager(true)}
             onEditPortfolioLinks={() => setShowPortfolioLinksModal(true)}
             onEditLanguages={() => setShowLanguagesModal(true)}
+            onDeleteExperience={handleDeleteExperience}
+            onDeleteEducation={handleDeleteEducation}
+            onDeleteProject={handleDeleteProject}
           />
         )}
         
@@ -337,6 +444,90 @@ export function SimplifyProfileLayout({ profileData, onProfileUpdate }: Simplify
           profileId={profileData.user_id}
         />
       )}
+
+      {/* Delete Experience Confirmation Dialog */}
+      <Dialog open={!!deletingExperienceId} onOpenChange={() => setDeletingExperienceId(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Experience</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-600">
+              Are you sure you want to delete this work experience? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeletingExperienceId(null)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteExperience}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Education Confirmation Dialog */}
+      <Dialog open={!!deletingEducationId} onOpenChange={() => setDeletingEducationId(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Education</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-600">
+              Are you sure you want to delete this education entry? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeletingEducationId(null)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteEducation}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Project Confirmation Dialog */}
+      <Dialog open={!!deletingProjectId} onOpenChange={() => setDeletingProjectId(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Project</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-600">
+              Are you sure you want to delete this project? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeletingProjectId(null)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteProject}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 

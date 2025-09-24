@@ -21,8 +21,6 @@ import {
   Building, 
   MapPin, 
   Calendar,
-  Clock,
-  DollarSign,
   Globe,
   FileCheck,
   CheckCircle2,
@@ -45,19 +43,19 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ApplicationDetailsModal } from "@/components/dashboard/ApplicationDetailsModal"
 
 interface Application {
   id: number
   position: string
   company: string
   location: string
-  salary_min: number | null
-  salary_max: number | null
-  salary_currency: string
   applied_date: string
-  apply_time: number
   source: string
   status: string
+  custom_resume_url?: string
+  custom_resume_generated_at?: string
+  custom_resume_status?: 'not_generated' | 'generating' | 'completed' | 'failed'
 }
 
 interface StatusStyleProps {
@@ -72,6 +70,8 @@ export default function ApplicationsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null)
   const itemsPerPage = 10
 
   useEffect(() => {
@@ -132,6 +132,16 @@ export default function ApplicationsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const handleRowClick = (applicationId: number) => {
+    setSelectedApplicationId(applicationId.toString())
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedApplicationId(null)
+  }
+
   if (error) {
     return (
       <div className="p-8">
@@ -186,7 +196,7 @@ export default function ApplicationsPage() {
         return {
           bgColor: 'bg-gray-100',
           textColor: 'text-gray-800',
-          icon: <Clock className="h-3.5 w-3.5 mr-1" />
+          icon: <Clock3 className="h-3.5 w-3.5 mr-1" />
         }
     }
   }
@@ -231,7 +241,7 @@ export default function ApplicationsPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2 border-b bg-gradient-to-r from-blue-50 to-white">
             <CardTitle className="text-base font-semibold text-gray-800">Pending</CardTitle>
             <div className="text-[#0A66C2] bg-blue-100 p-2 rounded-full group-hover:scale-110 transition-transform">
-              <Clock className="h-5 w-5" />
+              <Clock3 className="h-5 w-5" />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
@@ -311,10 +321,9 @@ export default function ApplicationsPage() {
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Position</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Company</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Location</TableHead>
-                      <TableHead className="font-semibold text-gray-700 bg-gray-50">Salary Range</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Applied Date</TableHead>
-                      <TableHead className="font-semibold text-gray-700 bg-gray-50">Apply Time</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Source</TableHead>
+                      <TableHead className="font-semibold text-gray-700 bg-gray-50">Custom Resume</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Status</TableHead>
                       <TableHead className="font-semibold text-gray-700 bg-gray-50">Actions</TableHead>
               </TableRow>
@@ -322,7 +331,7 @@ export default function ApplicationsPage() {
             <TableBody>
                     {currentItems.length === 0 ? (
                 <TableRow>
-                        <TableCell colSpan={9} className="text-center py-16 text-gray-500">
+                        <TableCell colSpan={8} className="text-center py-16 text-gray-500">
                           <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                           <p className="font-medium">
                     {searchQuery ? 'No applications match your search' : 'No applications yet'}
@@ -336,7 +345,11 @@ export default function ApplicationsPage() {
                       currentItems.map((app) => {
                         const statusStyle = getStatusStyle(app.status);
                         return (
-                          <TableRow key={app.id} className="hover:bg-blue-50/30 transition-colors">
+                          <TableRow 
+                            key={app.id} 
+                            className="hover:bg-blue-50/30 transition-colors cursor-pointer" 
+                            onClick={() => handleRowClick(app.id)}
+                          >
                             <TableCell className="font-medium text-gray-900">{app.position}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
@@ -353,18 +366,6 @@ export default function ApplicationsPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {app.salary_min && app.salary_max ? (
-                                <div className="flex items-center gap-1.5">
-                                  <DollarSign className="h-3.5 w-3.5 text-gray-400" />
-                                  <span>
-                                    {app.salary_currency}{app.salary_min.toLocaleString()} - {app.salary_currency}{app.salary_max.toLocaleString()}
-                                  </span>
-                                </div>
-                              ) : (
-                                <span className="text-gray-400 text-sm">Not specified</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
                               <div className="flex flex-col">
                                 <div className="flex items-center gap-1.5">
                                   <Calendar className="h-3.5 w-3.5 text-gray-400" />
@@ -375,17 +376,20 @@ export default function ApplicationsPage() {
                                 </span>
                               </div>
                             </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-1.5">
-                                <Clock className="h-3.5 w-3.5 text-gray-400" />
-                                <span>{app.apply_time} min</span>
-                              </div>
-                            </TableCell>
                     <TableCell>
                               <div className="flex items-center gap-1.5">
                                 <Globe className="h-3.5 w-3.5 text-gray-400" />
                                 <span>{app.source}</span>
                               </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {app.custom_resume_url ? (
+                        <a href={app.custom_resume_url} target="_blank" rel="noopener noreferrer" title="View Custom Resume">
+                          <FileText className="h-5 w-5 text-blue-600 hover:text-blue-800 inline" />
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </TableCell>
                     <TableCell>
                               <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusStyle.bgColor} ${statusStyle.textColor}`}>
@@ -464,6 +468,15 @@ export default function ApplicationsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Application Details Modal */}
+      {selectedApplicationId && (
+        <ApplicationDetailsModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          applicationId={selectedApplicationId}
+        />
+      )}
     </div>
   )
 } 

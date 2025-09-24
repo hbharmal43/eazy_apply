@@ -20,7 +20,8 @@ import {
   Code,
   Languages as LanguagesIcon,
   Award,
-  FileText
+  FileText,
+  Trash2
 } from "lucide-react"
 import { ResumeUpload } from "./ResumeUpload"
 
@@ -33,6 +34,9 @@ interface ProfileTabProps {
   onManageSkills: () => void
   onEditPortfolioLinks: () => void
   onEditLanguages: () => void
+  onDeleteExperience: (experienceId: string) => void
+  onDeleteEducation: (educationId: string) => void
+  onDeleteProject: (projectId: string) => void
 }
 
 export function ProfileTab({ 
@@ -43,7 +47,10 @@ export function ProfileTab({
   onEditProject,
   onManageSkills,
   onEditPortfolioLinks,
-  onEditLanguages
+  onEditLanguages,
+  onDeleteExperience,
+  onDeleteEducation,
+  onDeleteProject
 }: ProfileTabProps) {
 
 
@@ -91,6 +98,14 @@ export function ProfileTab({
                       onClick={() => onEditExperience(exp)}
                     >
                       <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => onDeleteExperience(exp.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -158,6 +173,14 @@ export function ProfileTab({
                       onClick={() => onEditEducation(edu)}
                     >
                       <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => onDeleteEducation(edu.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -246,6 +269,14 @@ export function ProfileTab({
                       onClick={() => onEditProject(project)}
                     >
                       <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => onDeleteProject(project.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>

@@ -101,16 +101,23 @@ export interface Application {
   company: string
   location: string
   work_type: 'remote' | 'hybrid' | 'onsite'
-  salary_min: number
-  salary_max: number
-  salary_currency: string
   applied_date: string
-  apply_time: number
   source: string
   status: 'applied' | 'screening' | 'interview' | 'offer' | 'rejected' | 'withdrawn'
   company_url?: string
   job_description?: string
   notes?: string
+  custom_resume_url?: string
+  custom_resume_generated_at?: string
+  custom_resume_status?: 'not_generated' | 'generating' | 'completed' | 'failed'
+  job_identifier?: string
+}
+
+export interface ApplicationWithCustomFiles extends Application {
+  custom_resume_url?: string
+  custom_resume_created_at?: string
+  custom_cover_letter_url?: string
+  custom_cover_letter_created_at?: string
 }
 
 export interface ApplicationStats {
@@ -171,19 +178,6 @@ export async function getApplications() {
   return data
 }
 
-export async function getRecentApplications(limit = 5) {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-
-  const { data, error } = await supabase
-    .from('recent_applications')
-    .select('*')
-    .eq('user_id', user.id)
-    .limit(limit)
-
-  if (error) throw error
-  return data
-}
 
 export async function addApplication(application: Omit<Application, 'id'>) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -362,6 +356,67 @@ export async function filterApplications({
 
   if (error) throw error
   return data
+}
+
+export async function getApplicationWithCustomFiles(applicationId: string): Promise<ApplicationWithCustomFiles> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  // First get the application to ensure it exists and belongs to the user
+  const { data: application, error: appError } = await supabase
+    .from('applications')
+    .select('*')
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (appError) {
+    if (appError.code === 'PGRST116') {
+      throw new Error('Application not found')
+    }
+    throw appError
+  }
+
+  if (!application) {
+    throw new Error('Application not found')
+  }
+
+  // Get custom resume if job_identifier exists
+  let customResume = null
+  if (application.job_identifier) {
+    const { data: resumeData } = await supabase
+      .from('custom_resumes')
+      .select('resume_url, created_at')
+      .eq('job_identifier', application.job_identifier)
+      .eq('user_id', user.id)
+      .single()
+    
+    customResume = resumeData
+  }
+
+  // Get custom cover letter if job_identifier exists
+  let customCoverLetter = null
+  if (application.job_identifier) {
+    const { data: coverLetterData } = await supabase
+      .from('custom_cover_letters')
+      .select('cover_letter_url, created_at')
+      .eq('job_identifier', application.job_identifier)
+      .eq('user_id', user.id)
+      .single()
+    
+    customCoverLetter = coverLetterData
+  }
+
+  // Combine all data
+  const applicationWithFiles: ApplicationWithCustomFiles = {
+    ...application,
+    custom_resume_url: customResume?.resume_url || undefined,
+    custom_resume_created_at: customResume?.created_at || undefined,
+    custom_cover_letter_url: customCoverLetter?.cover_letter_url || undefined,
+    custom_cover_letter_created_at: customCoverLetter?.created_at || undefined,
+  }
+
+  return applicationWithFiles
 }
 
 export async function updateDailyGoal(goal: number) {

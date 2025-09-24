@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Overview } from "@/components/dashboard/overview"
-import { RecentApplications } from "@/components/dashboard/recent-applications"
 import { EditGoalDialog } from "@/components/dashboard/edit-goal-dialog"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { 
@@ -33,13 +32,14 @@ import Link from "next/link"
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState<ApplicationStats>({
-    applications_total: 0,
+    total_applications: 0,
+    applications_this_week: 0,
     applications_today: 0,
     current_streak: 0,
+    response_rate: 0,
     longest_streak: 0,
-    streak_start_date: null,
-    avg_apply_time: 0,
-    total_time_saved: 0
+    last_application_date: '',
+    streak_start_date: ''
   })
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -217,7 +217,7 @@ export default function DashboardPage() {
               <div className="text-gray-500">days</div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              Started {new Date(stats.streak_start_date || Date.now()).toLocaleDateString()}
+              Started {stats.streak_start_date ? new Date(stats.streak_start_date).toLocaleDateString() : 'Recently'}
             </div>
             <div className="mt-3 text-blue-600 text-sm font-medium">
               Keep it going! Apply today to maintain your streak
@@ -255,9 +255,9 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
         {/* Application Overview */}
-        <Card className="col-span-4 bg-white border-none shadow-md hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
+        <Card className="bg-white border-none shadow-md hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between border-b pb-4 bg-gradient-to-r from-blue-50 to-white">
             <CardTitle className="text-lg font-semibold text-gray-800">Application Activity</CardTitle>
             <select
@@ -276,7 +276,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Tips */}
-        <Card className="col-span-3 bg-white border-none shadow-md hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
+        <Card className="bg-white border-none shadow-md hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
           <CardHeader className="border-b pb-4 bg-gradient-to-r from-blue-50 to-white">
             <CardTitle className="text-lg font-semibold text-gray-800">Quick Tips</CardTitle>
           </CardHeader>
@@ -312,29 +312,6 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Applications */}
-        <Card className="col-span-7 bg-white border-none shadow-md hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
-          <CardHeader className="border-b pb-4 bg-gradient-to-r from-blue-50 to-white">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-gray-800">Recent Applications</CardTitle>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                asChild
-                className="border-[#0A66C2] text-[#0A66C2] hover:bg-blue-50 hover:text-blue-700 transition-colors"
-              >
-                <Link href="/dashboard/applications" className="flex items-center gap-1">
-                  View All
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <RecentApplications />
           </CardContent>
         </Card>
       </div>
